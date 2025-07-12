@@ -16,12 +16,16 @@ import BusinessDashboard from './components/business/BusinessDashboard';
 import BusinessMeasurements from './components/business/BusinessMeasurements';
 import BusinessProducts from './components/business/Products';
 import BusinessOrders from './components/business/Orders';
+import BusinessCart from './components/business/Cart';
+import BusinessCheckout from './components/business/Checkout';
 
 // Individual Components
 import IndividualDashboard from './components/individual/IndividualDashboard';
 import IndividualMeasurements from './components/individual/IndividualMeasurements';
 import IndividualProducts from './components/individual/Products';
 import IndividualOrders from './components/individual/Orders';
+import IndividualCart from './components/individual/Cart';
+import IndividualCheckout from './components/individual/Checkout';
 
 // Super Admin Components
 import SuperAdminDashboard from './components/superadmin/SuperAdminDashboard';
@@ -54,6 +58,12 @@ function App() {
           <Route path="/business/products" element={
             user?.type === 'business' ? <BusinessProducts /> : <Navigate to="/business/login" />
           } />
+          <Route path="/business/cart" element={
+            user?.type === 'business' ? <BusinessCart userType="business" /> : <Navigate to="/business/login" />
+          } />
+          <Route path="/business/checkout" element={
+            user?.type === 'business' ? <BusinessCheckout userType="business" /> : <Navigate to="/business/login" />
+          } />
           <Route path="/business/orders" element={
             user?.type === 'business' ? <BusinessOrders /> : <Navigate to="/business/login" />
           } />
@@ -67,6 +77,12 @@ function App() {
           } />
           <Route path="/individual/products" element={
             user?.type === 'individual' ? <IndividualProducts /> : <Navigate to="/individual/login" />
+          } />
+          <Route path="/individual/cart" element={
+            user?.type === 'individual' ? <IndividualCart userType="individual" /> : <Navigate to="/individual/login" />
+          } />
+          <Route path="/individual/checkout" element={
+            user?.type === 'individual' ? <IndividualCheckout userType="individual" /> : <Navigate to="/individual/login" />
           } />
           <Route path="/individual/orders" element={
             user?.type === 'individual' ? <IndividualOrders /> : <Navigate to="/individual/login" />

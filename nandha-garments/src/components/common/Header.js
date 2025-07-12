@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { productsAPI } from '../../services/api';
 import { 
   User, 
   LogOut, 
@@ -20,11 +21,31 @@ import {
 const Header = ({ userType }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [cartItemCount, setCartItemCount] = useState(0);
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const dropdownRef = useRef(null);
+
+  // Fetch cart item count
+  useEffect(() => {
+    fetchCartItemCount();
+  }, [location.pathname]); // Refetch when route changes
+
+  const fetchCartItemCount = async () => {
+    try {
+      if (userType === 'business' || userType === 'individual') {
+        const response = await productsAPI.getCart();
+        const items = response.data.data || [];
+        const totalItems = items.reduce((total, item) => total + item.quantity, 0);
+        setCartItemCount(totalItems);
+      }
+    } catch (error) {
+      console.error('Error fetching cart count:', error);
+      setCartItemCount(0);
+    }
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -228,6 +249,63 @@ const Header = ({ userType }) => {
             alignItems: 'center',
             gap: '12px'
           }}>
+            {/* Cart Icon (only for business and individual users) */}
+            {(userType === 'business' || userType === 'individual') && (
+              <Link
+                to={`/${userType}/cart`}
+                style={{
+                  position: 'relative',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '8px 12px',
+                  color: 'white',
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.3s ease',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+                  e.target.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+                className="hidden md:flex"
+              >
+                <ShoppingCart size={18} />
+                <span>Cart</span>
+                {cartItemCount > 0 && (
+                  <span style={{
+                    position: 'absolute',
+                    top: '-6px',
+                    right: '-6px',
+                    background: '#ef4444',
+                    color: 'white',
+                    borderRadius: '50%',
+                    width: '20px',
+                    height: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    border: '2px solid white'
+                  }}>
+                    {cartItemCount > 99 ? '99+' : cartItemCount}
+                  </span>
+                )}
+              </Link>
+            )}
+
             {/* User Profile Dropdown */}
             <div style={{ position: 'relative' }} ref={dropdownRef}>
               <button 
@@ -357,32 +435,58 @@ const Header = ({ userType }) => {
 
                   {/* Menu Items */}
                   <div style={{ padding: '8px' }}>
-                    <button 
-                      onClick={toggleTheme}
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '12px',
-                        border: 'none',
-                        background: 'transparent',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        color: '#374151',
-                        transition: 'all 0.3s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.background = '#f3f4f6';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.background = 'transparent';
-                      }}
-                    >
-                      {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
-                      {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-                    </button>
+                    {/* Cart Link for Mobile (appears in dropdown) */}
+                    {(userType === 'business' || userType === 'individual') && (
+                      <Link
+                        to={`/${userType}/cart`}
+                        onClick={() => setShowDropdown(false)}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '12px',
+                          border: 'none',
+                          background: 'transparent',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontSize: '14px',
+                          color: '#374151',
+                          textDecoration: 'none',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.background = '#f3f4f6';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background = 'transparent';
+                        }}
+                      >
+                        <div style={{ position: 'relative' }}>
+                          <ShoppingCart size={16} />
+                          {cartItemCount > 0 && (
+                            <span style={{
+                              position: 'absolute',
+                              top: '-6px',
+                              right: '-6px',
+                              background: '#ef4444',
+                              color: 'white',
+                              borderRadius: '50%',
+                              width: '16px',
+                              height: '16px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '10px',
+                              fontWeight: '600'
+                            }}>
+                              {cartItemCount > 9 ? '9+' : cartItemCount}
+                            </span>
+                          )}
+                        </div>
+                        Cart ({cartItemCount} items)
+                      </Link>
+                    )}
 
                     <button 
                       style={{
@@ -530,6 +634,47 @@ const Header = ({ userType }) => {
                   {getUserTypeLabel()}
                 </div>
               </div>
+              {/* Cart icon for mobile */}
+              {(userType === 'business' || userType === 'individual') && (
+                <Link
+                  to={`/${userType}/cart`}
+                  onClick={() => setShowMobileMenu(false)}
+                  style={{
+                    marginLeft: 'auto',
+                    position: 'relative',
+                    background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                    color: 'white',
+                    padding: '8px',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <ShoppingCart size={20} />
+                  {cartItemCount > 0 && (
+                    <span style={{
+                      position: 'absolute',
+                      top: '-6px',
+                      right: '-6px',
+                      background: '#ef4444',
+                      color: 'white',
+                      borderRadius: '50%',
+                      width: '18px',
+                      height: '18px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '10px',
+                      fontWeight: '600',
+                      border: '2px solid white'
+                    }}>
+                      {cartItemCount > 9 ? '9+' : cartItemCount}
+                    </span>
+                  )}
+                </Link>
+              )}
             </div>
 
             {/* Mobile Navigation Links */}
@@ -577,29 +722,6 @@ const Header = ({ userType }) => {
               paddingTop: '16px',
               borderTop: '1px solid #e5e7eb'
             }}>
-              <button 
-                onClick={() => {
-                  toggleTheme();
-                  setShowMobileMenu(false);
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  border: 'none',
-                  background: 'transparent',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  color: '#374151',
-                  transition: 'all 0.3s ease',
-                  width: '100%'
-                }}
-              >
-                {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-                {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-              </button>
 
               <button 
                 onClick={handleLogout}

@@ -85,7 +85,7 @@ const ManageOrders = () => {
 
   if (loading) {
     return (
-      <Layout userType="superadmin">
+      <Layout user_type="superadmin">
         <div style={{ 
           display: 'flex', 
           justifyContent: 'center', 
@@ -111,7 +111,7 @@ const ManageOrders = () => {
   }
 
   return (
-    <Layout userType="superadmin">
+    <Layout user_type="superadmin">
       <div className="fade-in" style={{ 
         padding: '24px',
         maxWidth: '1400px',
@@ -284,26 +284,12 @@ const ManageOrders = () => {
                       </td>
                       <td style={{ padding: '16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div style={{
-                            width: '40px',
-                            height: '40px',
-                            background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-                            borderRadius: '10px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'white',
-                            fontSize: '14px',
-                            fontWeight: '600'
-                          }}>
-                            {order.userName?.charAt(0)?.toUpperCase() || ''}
-                          </div>
                           <div>
                             <p style={{ fontWeight: '600', marginBottom: '2px', color: '#1f2937' }}>
-                              {order.userName}
+                              {order.user_name}
                             </p>
                             <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>
-                              {order.userEmail}
+                              {order.user_email}
                             </p>
                           </div>
                         </div>
@@ -311,7 +297,7 @@ const ManageOrders = () => {
                       <td style={{ padding: '16px', textAlign: 'center' }}>
                         <span style={{ 
                           padding: '6px 12px',
-                          background: order.userType === 'business' 
+                          background: order.user_type === 'business' 
                             ? 'linear-gradient(135deg, #f59e0b, #d97706)' 
                             : 'linear-gradient(135deg, #10b981, #059669)',
                           color: 'white',
@@ -320,7 +306,7 @@ const ManageOrders = () => {
                           fontWeight: '600',
                           textTransform: 'capitalize'
                         }}>
-                          {order.userType}
+                          {order.user_type}
                         </span>
                       </td>
                       <td style={{ padding: '16px' }}>
@@ -557,17 +543,17 @@ const ManageOrders = () => {
                 }}>
                   <div>
                     <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Name</p>
-                    <p style={{ fontWeight: '600', margin: 0, color: '#1f2937' }}>{selectedOrder.userName}</p>
+                    <p style={{ fontWeight: '600', margin: 0, color: '#1f2937' }}>{selectedOrder.user_name}</p>
                   </div>
                   <div>
                     <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email</p>
-                    <p style={{ fontWeight: '500', margin: 0, color: '#1f2937' }}>{selectedOrder.userEmail}</p>
+                    <p style={{ fontWeight: '500', margin: 0, color: '#1f2937' }}>{selectedOrder.user_email}</p>
                   </div>
                   <div>
                     <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Type</p>
                     <span style={{ 
                       padding: '4px 12px',
-                      background: selectedOrder.userType === 'business' 
+                      background: selectedOrder.user_type === 'business' 
                         ? 'linear-gradient(135deg, #f59e0b, #d97706)' 
                         : 'linear-gradient(135deg, #10b981, #059669)',
                       color: 'white',
@@ -576,7 +562,7 @@ const ManageOrders = () => {
                       fontWeight: '600',
                       textTransform: 'capitalize'
                     }}>
-                      {selectedOrder.userType}
+                      {selectedOrder.user_type}
                     </span>
                   </div>
                   <div>

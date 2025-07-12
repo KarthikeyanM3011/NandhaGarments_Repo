@@ -382,7 +382,7 @@ const BusinessDashboard = () => {
                 <h3 style={{ fontSize: '1.8rem', fontWeight: '700', margin: 0 }}>
                   {formatCurrency(dashboardData.totalRevenue)}
                 </h3>
-                <p style={{ margin: 0, opacity: 0.9 }}>Total Revenue</p>
+                <p style={{ margin: 0, opacity: 0.9 }}>Total Spent</p>
               </div>
             </div>
           </div>

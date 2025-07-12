@@ -70,9 +70,14 @@ export const individualAPI = {
 export const productsAPI = {
   getProducts: (params) => api.get('/products', { params }),
   getProduct: (id) => api.get(`/products/${id}`),
-  addToCart: (data) => api.post('/cart', data),
+  
+  // Cart management
   getCart: () => api.get('/cart'),
-  removeFromCart: (id) => api.delete(`/cart/${id}`),
+  addToCart: (data) => api.post('/cart', data),
+  updateCartItem: (itemId, data) => api.put(`/cart/${itemId}`, data),
+  removeFromCart: (itemId) => api.delete(`/cart/${itemId}`),
+  clearCart: () => api.delete('/cart'),
+  
 };
 
 export const superAdminAPI = {

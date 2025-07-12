@@ -259,7 +259,8 @@ def get_all_products():
         connection = get_db_connection()
         cursor = connection.cursor()
         
-        cursor.execute("SELECT * FROM products ORDER BY created_at DESC")
+        # Remove ORDER BY to avoid sorting large datasets
+        cursor.execute("SELECT * FROM products LIMIT 100")  # Limit to prevent memory issues
         products = cursor.fetchall()
         
         for product in products:
@@ -286,7 +287,7 @@ def get_all_products():
             'message': 'Failed to fetch products',
             'error': str(e)
         }), 500
-
+        
 @superadmin_bp.route('/superadmin/products', methods=['POST'])
 @require_auth(['superadmin'])
 def create_product():

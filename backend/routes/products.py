@@ -197,3 +197,98 @@ def remove_from_cart(cart_item_id):
             'message': 'Failed to remove item from cart',
             'error': str(e)
         }), 500
+
+@products_bp.route('/cart/<int:cart_item_id>', methods=['PUT'])
+@require_auth(['business', 'individual'])
+def update_cart_item(cart_item_id):
+    try:
+        data = request.get_json()
+        
+        if not data.get('quantity'):
+            return jsonify({
+                'success': False,
+                'message': 'Quantity is required',
+                'error': 'Missing required fields'
+            }), 400
+        
+        quantity = data['quantity']
+        
+        if not isinstance(quantity, int) or quantity <= 0:
+            return jsonify({
+                'success': False,
+                'message': 'Quantity must be a positive integer',
+                'error': 'Invalid quantity value'
+            }), 400
+        
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        
+        cursor.execute(
+            "SELECT * FROM cart_items WHERE id = %s AND user_id = %s", 
+            (cart_item_id, g.current_user['id'])
+        )
+        cart_item = cursor.fetchone()
+        
+        if not cart_item:
+            connection.close()
+            return jsonify({
+                'success': False,
+                'message': 'Cart item not found',
+                'error': 'Invalid cart item ID or unauthorized access'
+            }), 404
+        
+        cursor.execute(
+            "UPDATE cart_items SET quantity = %s, updated_at = NOW() WHERE id = %s AND user_id = %s",
+            (quantity, cart_item_id, g.current_user['id'])
+        )
+        
+        if cursor.rowcount > 0:
+            query = """
+            SELECT ci.*, p.name as product_name, p.selling_price as price, p.images
+            FROM cart_items ci
+            JOIN products p ON ci.product_id = p.id
+            WHERE ci.id = %s AND ci.user_id = %s
+            """
+            
+            cursor.execute(query, (cart_item_id, g.current_user['id']))
+            updated_item = cursor.fetchone()
+            
+            mapped_item = {
+                'id': updated_item['id'],
+                'productId': updated_item['product_id'],
+                'productName': updated_item['product_name'],
+                'quantity': updated_item['quantity'],
+                'price': updated_item['price'],
+                'size': updated_item['size'],
+                'createdAt': updated_item['created_at'],
+                'updatedAt': updated_item['updated_at']
+            }
+            
+            if updated_item['images']:
+                import json
+                images = json.loads(updated_item['images'])
+                mapped_item['image'] = images[0] if images else None
+            else:
+                mapped_item['image'] = None
+            
+            connection.close()
+            
+            return jsonify({
+                'success': True,
+                'message': 'Cart item updated successfully',
+                'data': mapped_item
+            })
+        else:
+            connection.close()
+            return jsonify({
+                'success': False,
+                'message': 'Failed to update cart item',
+                'error': 'Update operation failed'
+            }), 500
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': 'Failed to update cart item',
+            'error': str(e)
+        }), 500

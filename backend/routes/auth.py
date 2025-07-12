@@ -6,6 +6,7 @@ from config import Config
 from models.user import User
 from utils.database import get_db_connection
 from utils.validators import validate_email, validate_gst, validate_pan, validate_phone
+from utils.field_mapping import map_business_profile_to_frontend, map_individual_profile_to_frontend
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -106,6 +107,8 @@ def business_login():
         'exp': datetime.utcnow() + timedelta(hours=Config.JWT_ACCESS_TOKEN_EXPIRE_HOURS)
     }, Config.JWT_SECRET_KEY, algorithm=Config.JWT_ALGORITHM)
     
+    mapped_profile = map_business_profile_to_frontend(profile) if profile else {}
+    
     return jsonify({
         'success': True,
         'message': 'Login successful',
@@ -114,8 +117,8 @@ def business_login():
             'user': {
                 'id': user['id'],
                 'email': user['email'],
-                'companyName': profile['legal_entity_name'] if profile else '',
-                'contactPersonName': profile['contact_person_name'] if profile else '',
+                'companyName': mapped_profile.get('legalEntityName', ''),
+                'contactPersonName': mapped_profile.get('contactPersonName', ''),
                 'type': user['user_type'],
                 'status': user['status']
             }
@@ -242,6 +245,8 @@ def individual_login():
         'exp': datetime.utcnow() + timedelta(hours=Config.JWT_ACCESS_TOKEN_EXPIRE_HOURS)
     }, Config.JWT_SECRET_KEY, algorithm=Config.JWT_ALGORITHM)
     
+    mapped_profile = map_individual_profile_to_frontend(profile) if profile else {}
+    
     return jsonify({
         'success': True,
         'message': 'Login successful',
@@ -250,7 +255,7 @@ def individual_login():
             'user': {
                 'id': user['id'],
                 'email': user['email'],
-                'name': profile['name'] if profile else '',
+                'name': mapped_profile.get('name', ''),
                 'type': user['user_type']
             }
         }

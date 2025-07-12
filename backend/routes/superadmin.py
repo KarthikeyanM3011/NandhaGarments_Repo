@@ -4,6 +4,7 @@ from models.user import User
 from models.product import Product
 from models.order import Order
 from utils.database import get_db_connection
+from utils.field_mapping import map_business_profile_to_frontend, map_individual_profile_to_frontend
 
 superadmin_bp = Blueprint('superadmin', __name__)
 
@@ -92,9 +93,31 @@ def get_business_users():
         users = cursor.fetchall()
         connection.close()
         
+        mapped_users = []
+        for user in users:
+            mapped_user = {
+                'id': user['id'],
+                'email': user['email'],
+                'status': user['status'],
+                'createdAt': user['created_at']
+            }
+            if user['legal_entity_name']:
+                profile_data = {
+                    'legal_entity_name': user['legal_entity_name'],
+                    'contact_person_name': user['contact_person_name'],
+                    'contact_number': user['contact_number'],
+                    'gst_number': user['gst_number'],
+                    'pan_number': user['pan_number'],
+                    'address': user['address'],
+                    'logo': user['logo']
+                }
+                mapped_profile = map_business_profile_to_frontend(profile_data)
+                mapped_user.update(mapped_profile)
+            mapped_users.append(mapped_user)
+        
         return jsonify({
             'success': True,
-            'data': users
+            'data': mapped_users
         })
         
     except Exception as e:
@@ -124,9 +147,27 @@ def get_individual_users():
         users = cursor.fetchall()
         connection.close()
         
+        mapped_users = []
+        for user in users:
+            mapped_user = {
+                'id': user['id'],
+                'email': user['email'],
+                'status': user['status'],
+                'createdAt': user['created_at']
+            }
+            if user['name']:
+                profile_data = {
+                    'name': user['name'],
+                    'contact_number': user['contact_number'],
+                    'address': user['address']
+                }
+                mapped_profile = map_individual_profile_to_frontend(profile_data)
+                mapped_user.update(mapped_profile)
+            mapped_users.append(mapped_user)
+        
         return jsonify({
             'success': True,
-            'data': users
+            'data': mapped_users
         })
         
     except Exception as e:

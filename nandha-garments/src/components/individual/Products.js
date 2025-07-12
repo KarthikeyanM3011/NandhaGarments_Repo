@@ -515,20 +515,6 @@ const Products = () => {
                         {product.name}
                       </h3>
                       
-                      {/* Rating */}
-                      <div style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '8px', 
-                        marginBottom: '12px' 
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                          {renderStars(product.rating)}
-                        </div>
-                        <span style={{ fontSize: '14px', color: '#6b7280' }}>
-                          ({product.reviews || 0} reviews)
-                        </span>
-                      </div>
 
                       {/* Price */}
                       <div style={{ marginBottom: '12px' }}>
@@ -691,14 +677,6 @@ const Products = () => {
                         {product.name}
                       </h3>
                       
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                          {renderStars(product.rating)}
-                        </div>
-                        <span style={{ fontSize: '14px', color: '#6b7280' }}>
-                          ({product.reviews || 0})
-                        </span>
-                      </div>
 
                       <p style={{ 
                         fontSize: '14px', 
@@ -1014,21 +992,6 @@ const Products = () => {
                   >
                     ×
                   </button>
-                </div>
-
-                {/* Rating */}
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '8px', 
-                  marginBottom: '16px' 
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                    {renderStars(selectedProduct.rating)}
-                  </div>
-                  <span style={{ fontSize: '14px', color: '#6b7280' }}>
-                    ({selectedProduct.reviews || 0} reviews)
-                  </span>
                 </div>
 
                 {/* Price */}

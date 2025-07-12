@@ -1,4 +1,5 @@
 from utils.database import get_db_connection
+from utils.field_mapping import map_measurement_to_frontend
 
 class Measurement:
     @staticmethod
@@ -33,7 +34,8 @@ class Measurement:
         cursor.execute("SELECT * FROM measurements WHERE user_id = %s ORDER BY created_at DESC", (user_id,))
         measurements = cursor.fetchall()
         connection.close()
-        return measurements
+        
+        return [map_measurement_to_frontend(measurement) for measurement in measurements]
     
     @staticmethod
     def update_measurement(measurement_id, user_id, data):

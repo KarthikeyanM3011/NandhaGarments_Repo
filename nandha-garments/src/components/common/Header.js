@@ -13,7 +13,6 @@ import {
   ShoppingCart,
   Ruler,
   Settings,
-  Bell,
   Menu,
   X
 } from 'lucide-react';
@@ -21,7 +20,6 @@ import {
 const Header = ({ userType }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [notifications] = useState(3); // Example notification count
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -230,48 +228,6 @@ const Header = ({ userType }) => {
             alignItems: 'center',
             gap: '12px'
           }}>
-            {/* Notifications */}
-            <button style={{
-              position: 'relative',
-              background: 'rgba(255, 255, 255, 0.1)',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '8px',
-              color: 'white',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              backdropFilter: 'blur(10px)'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-            }}
-            className="hidden md:block"
-            >
-              <Bell size={18} />
-              {notifications > 0 && (
-                <span style={{
-                  position: 'absolute',
-                  top: '4px',
-                  right: '4px',
-                  background: '#ef4444',
-                  color: 'white',
-                  borderRadius: '50%',
-                  width: '16px',
-                  height: '16px',
-                  fontSize: '10px',
-                  fontWeight: '600',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  {notifications > 9 ? '9+' : notifications}
-                </span>
-              )}
-            </button>
-
             {/* User Profile Dropdown */}
             <div style={{ position: 'relative' }} ref={dropdownRef}>
               <button 

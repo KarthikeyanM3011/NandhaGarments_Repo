@@ -75,20 +75,33 @@ def get_cart():
         cursor.execute(query, (g.current_user['id'],))
         cart_items = cursor.fetchall()
         
+        mapped_cart_items = []
         for item in cart_items:
+            mapped_item = {
+                'id': item['id'],
+                'productId': item['product_id'],
+                'productName': item['product_name'],
+                'quantity': item['quantity'],
+                'price': item['price'],
+                'size': item['size'],
+                'createdAt': item['created_at'],
+                'updatedAt': item['updated_at']
+            }
+            
             if item['images']:
                 import json
                 images = json.loads(item['images'])
-                item['image'] = images[0] if images else None
+                mapped_item['image'] = images[0] if images else None
             else:
-                item['image'] = None
-            item.pop('images', None)
+                mapped_item['image'] = None
+                
+            mapped_cart_items.append(mapped_item)
         
         connection.close()
         
         return jsonify({
             'success': True,
-            'data': cart_items
+            'data': mapped_cart_items
         })
         
     except Exception as e:

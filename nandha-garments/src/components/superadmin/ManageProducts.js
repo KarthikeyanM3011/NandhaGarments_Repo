@@ -323,27 +323,6 @@ const ManageProducts = () => {
                     {product.description}
                   </p>
 
-                  {/* Rating */}
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '8px', 
-                    marginBottom: '12px' 
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                      {[...Array(5)].map((_, i) => (
-                        <Star 
-                          key={i} 
-                          size={14} 
-                          fill={i < (product.rating || 4) ? '#fbbf24' : 'none'}
-                          color="#fbbf24"
-                        />
-                      ))}
-                    </div>
-                    <span style={{ fontSize: '12px', color: '#6b7280' }}>
-                      ({product.reviews || 0} reviews)
-                    </span>
-                  </div>
                 </div>
 
                 {/* Pricing */}

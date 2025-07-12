@@ -1,4 +1,5 @@
 from utils.database import get_db_connection
+from utils.field_mapping import map_order_to_frontend
 
 class Order:
     @staticmethod
@@ -37,7 +38,7 @@ class Order:
             order['items'] = cursor.fetchall()
         
         connection.close()
-        return orders
+        return [map_order_to_frontend(order) for order in orders]
     
     @staticmethod
     def get_all_orders():
@@ -68,7 +69,7 @@ class Order:
             order['items'] = cursor.fetchall()
         
         connection.close()
-        return orders
+        return [map_order_to_frontend(order) for order in orders]
     
     @staticmethod
     def update_order_status(order_id, status):

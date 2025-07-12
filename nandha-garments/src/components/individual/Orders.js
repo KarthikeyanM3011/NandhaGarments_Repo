@@ -216,10 +216,6 @@ const Orders = () => {
                 <Package size={16} />
                 {orders.length} Total Order{orders.length !== 1 ? 's' : ''}
               </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <CreditCard size={16} />
-                {formatCurrency(orders.reduce((sum, order) => sum + order.totalAmount, 0))} Total Spent
-              </span>
             </div>
           </div>
         </div>

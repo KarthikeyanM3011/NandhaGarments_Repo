@@ -4,6 +4,7 @@ from models.measurement import Measurement
 from models.order import Order
 from models.product import Product
 from utils.database import get_db_connection
+from utils.field_mapping import map_measurement_to_backend
 
 individual_bp = Blueprint('individual', __name__)
 
@@ -35,13 +36,25 @@ def get_dashboard():
         
         connection.close()
         
+        mapped_recent_orders = []
+        for order in recent_orders:
+            mapped_order = {
+                'id': order['id'],
+                'productName': order['product_name'],
+                'quantity': order['quantity'],
+                'status': order['status'],
+                'amount': order['amount'],
+                'createdAt': order['created_at']
+            }
+            mapped_recent_orders.append(mapped_order)
+        
         return jsonify({
             'success': True,
             'data': {
                 'measurements': measurements_count,
                 'orders': orders_count,
                 'totalRevenue': total_revenue,
-                'recentOrders': recent_orders
+                'recentOrders': mapped_recent_orders
             }
         })
         
@@ -83,7 +96,8 @@ def create_measurement():
                     'error': 'Missing required field'
                 }), 400
         
-        measurement_id = Measurement.create_measurement(g.current_user['id'], data)
+        backend_data = map_measurement_to_backend(data)
+        measurement_id = Measurement.create_measurement(g.current_user['id'], backend_data)
         
         return jsonify({
             'success': True,
@@ -103,7 +117,8 @@ def create_measurement():
 def update_measurement(measurement_id):
     try:
         data = request.get_json()
-        success = Measurement.update_measurement(measurement_id, g.current_user['id'], data)
+        backend_data = map_measurement_to_backend(data)
+        success = Measurement.update_measurement(measurement_id, g.current_user['id'], backend_data)
         
         if success:
             return jsonify({

@@ -328,28 +328,6 @@ const Products = () => {
 
                   {/* Product Info */}
                   <div style={{ padding: '20px' }}>
-                    {/* Rating */}
-                    <div style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '8px', 
-                      marginBottom: '8px' 
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                        {[...Array(5)].map((_, i) => (
-                          <Star 
-                            key={i} 
-                            size={14} 
-                            fill={i < (product.rating || 4) ? '#fbbf24' : 'none'}
-                            color="#fbbf24"
-                          />
-                        ))}
-                      </div>
-                      <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '500' }}>
-                        ({product.reviews || 0} reviews)
-                      </span>
-                    </div>
-
                     {/* Product Name */}
                     <h3 style={{
                       fontSize: '1.1rem',

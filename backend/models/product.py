@@ -1,5 +1,6 @@
 import json
 from utils.database import get_db_connection
+from utils.field_mapping import map_product_to_frontend
 
 class Product:
     @staticmethod
@@ -70,7 +71,7 @@ class Product:
         paginated_products = filtered_products[start_index:end_index]
         
         connection.close()
-        return paginated_products, total_count
+        return [map_product_to_frontend(product) for product in paginated_products], total_count
         
     @staticmethod
     def get_product_by_id(product_id):
@@ -87,9 +88,10 @@ class Product:
                 product['available_sizes'] = json.loads(product['available_sizes'])
             if product['specifications']:
                 product['specifications'] = json.loads(product['specifications'])
+            return map_product_to_frontend(product)
         
         connection.close()
-        return product
+        return None
     
     @staticmethod
     def update_product(product_id, data):

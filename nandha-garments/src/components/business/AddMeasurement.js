@@ -199,7 +199,7 @@ const AddMeasurement = ({ userType, measurement, onSubmit, onCancel }) => {
             marginBottom: '16px'
           }}>
             {userType === 'business' 
-              ? 'Enter customer measurement details for accurate tailoring'
+              ? 'Enter measurement details for accurate tailoring'
               : 'Enter your measurement details for accurate tailoring'
             }
           </p>

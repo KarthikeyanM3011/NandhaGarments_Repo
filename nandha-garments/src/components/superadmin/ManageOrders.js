@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../common/Layout';
 import { superAdminAPI } from '../../services/api';
-import { Package, Eye, Calendar, MapPin, User, ShoppingCart, TrendingUp, Clock, CheckCircle } from 'lucide-react';
+import { Package, Eye, Calendar, MapPin, User, ShoppingCart, TrendingUp, Clock, CheckCircle, Download, X, Filter } from 'lucide-react';
 import { ORDER_STATUS } from '../../utils/constants';
+import DownloadOrdersModal from './DownloadOrdersModal';
+import { generateOrdersPDF } from '../../utils/pdfGenerator';
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -37,6 +40,22 @@ const ManageOrders = () => {
       console.error('Error updating order status:', error);
     } finally {
       setUpdatingStatus(null);
+    }
+  };
+
+  const handleDownloadOrders = async (filters) => {
+    try {
+      // Fetch orders with measurements for download
+      const response = await superAdminAPI.getOrdersForDownload(filters);
+      const ordersWithMeasurements = response.data.data;
+      
+      // Generate PDF
+      generateOrdersPDF(ordersWithMeasurements, filters);
+      
+      setShowDownloadModal(false);
+    } catch (error) {
+      console.error('Error downloading orders:', error);
+      alert('Failed to download orders. Please try again.');
     }
   };
 
@@ -85,7 +104,7 @@ const ManageOrders = () => {
 
   if (loading) {
     return (
-      <Layout user_type="superadmin">
+      <Layout userType="superadmin">
         <div style={{ 
           display: 'flex', 
           justifyContent: 'center', 
@@ -111,7 +130,7 @@ const ManageOrders = () => {
   }
 
   return (
-    <Layout user_type="superadmin">
+    <Layout userType="superadmin">
       <div className="fade-in" style={{ 
         padding: '24px',
         maxWidth: '1400px',
@@ -138,40 +157,77 @@ const ManageOrders = () => {
             transform: 'translate(50%, -50%)'
           }}></div>
           
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <h1 style={{ 
-              fontSize: '2.5rem', 
-              fontWeight: '700', 
-              marginBottom: '8px',
-              background: 'linear-gradient(45deg, #ffffff, #f0f0f0)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}>
-              Manage Orders
-            </h1>
-            <p style={{ 
-              fontSize: '1.1rem', 
-              opacity: 0.9,
-              marginBottom: '16px'
-            }}>
-              View and manage all orders across the platform
-            </p>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '24px',
-              fontSize: '14px',
-              flexWrap: 'wrap'
-            }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <ShoppingCart size={16} />
-                {orders.length} Total Orders
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <TrendingUp size={16} />
-                {formatCurrency(orders.reduce((sum, order) => sum + order.totalAmount, 0))} Revenue
-              </span>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            position: 'relative',
+            zIndex: 1,
+            flexWrap: 'wrap',
+            gap: '16px'
+          }}>
+            <div>
+              <h1 style={{ 
+                fontSize: '2.5rem', 
+                fontWeight: '700', 
+                marginBottom: '8px',
+                background: 'linear-gradient(45deg, #ffffff, #f0f0f0)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}>
+                Manage Orders
+              </h1>
+              <p style={{ 
+                fontSize: '1.1rem', 
+                opacity: 0.9,
+                marginBottom: '16px'
+              }}>
+                View and manage all orders across the platform
+              </p>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '24px',
+                fontSize: '14px',
+                flexWrap: 'wrap'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <ShoppingCart size={16} />
+                  {orders.length} Total Orders
+                </span>
+              </div>
             </div>
+            
+            {/* Download Button */}
+            <button 
+              onClick={() => setShowDownloadModal(true)}
+              style={{
+                background: 'rgba(255, 255, 255, 0.2)',
+                border: 'none',
+                color: 'white',
+                padding: '12px 24px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.3s ease',
+                backdropFilter: 'blur(10px)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.3)';
+                e.target.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+                e.target.style.transform = 'translateY(0)';
+              }}
+            >
+              <Download size={20} />
+              Download Data
+            </button>
           </div>
         </div>
 
@@ -452,6 +508,16 @@ const ManageOrders = () => {
               Orders will appear here once customers start placing them
             </p>
           </div>
+        )}
+
+        {/* Download Orders Modal */}
+        {showDownloadModal && (
+          <DownloadOrdersModal
+            isOpen={showDownloadModal}
+            onClose={() => setShowDownloadModal(false)}
+            onDownload={handleDownloadOrders}
+            totalOrders={orders.length}
+          />
         )}
 
         {/* Order Details Modal */}

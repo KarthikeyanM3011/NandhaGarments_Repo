@@ -181,10 +181,6 @@ const ManageProducts = () => {
                   <Package size={16} />
                   {products.length} Products
                 </span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <DollarSign size={16} />
-                  {formatCurrency(products.reduce((sum, product) => sum + (product.sellingPrice || 0), 0))} Total Value
-                </span>
               </div>
             </div>
             

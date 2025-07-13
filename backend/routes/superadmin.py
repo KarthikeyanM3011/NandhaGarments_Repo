@@ -414,6 +414,126 @@ def get_all_orders():
             'error': str(e)
         }), 500
 
+@superadmin_bp.route('/superadmin/orders/download', methods=['POST'])
+@require_auth(['superadmin'])
+def get_orders_for_download():
+    try:
+        filters = request.get_json()
+        
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        
+        # Build the query based on filters
+        base_query = """
+        SELECT o.*, 
+               CASE 
+                   WHEN bp.contact_person_name IS NOT NULL THEN bp.contact_person_name
+                   WHEN ip.name IS NOT NULL THEN ip.name
+                   ELSE 'Unknown User'
+               END as user_name,
+               u.email as user_email,
+               u.user_type,
+               m.customer_id, m.name as measurement_name, m.gender, m.notes,
+               m.chest, m.waist, m.seat, m.shirtLength as shirt_length, 
+               m.armLength as arm_length, m.neck, m.hip, 
+               m.poloShirtLength as polo_shirt_length, m.shoulderWidth as shoulder_width, 
+               m.wrist, m.biceps
+        FROM orders o
+        JOIN users u ON o.user_id = u.id
+        LEFT JOIN business_profiles bp ON u.id = bp.user_id
+        LEFT JOIN individual_profiles ip ON u.id = ip.user_id
+        LEFT JOIN measurements m ON o.measurement_id = m.id
+        WHERE 1=1
+        """
+        
+        conditions = []
+        params = []
+        
+        # Apply filters
+        if filters.get('status') and filters['status'] != 'all':
+            conditions.append("o.status = %s")
+            params.append(filters['status'])
+        
+        if filters.get('userType') and filters['userType'] != 'all':
+            conditions.append("u.user_type = %s")
+            params.append(filters['userType'])
+        
+        if filters.get('dateFrom'):
+            conditions.append("DATE(o.created_at) >= %s")
+            params.append(filters['dateFrom'])
+        
+        if filters.get('dateTo'):
+            conditions.append("DATE(o.created_at) <= %s")
+            params.append(filters['dateTo'])
+        
+        # Add conditions to query
+        if conditions:
+            base_query += " AND " + " AND ".join(conditions)
+        
+        # Add sorting
+        sort_mapping = {
+            'newest': 'o.created_at DESC',
+            'oldest': 'o.created_at ASC',
+            'amount_high': 'o.total_amount DESC',
+            'amount_low': 'o.total_amount ASC'
+        }
+        
+        sort_by = filters.get('sortBy', 'newest')
+        if sort_by in sort_mapping:
+            base_query += f" ORDER BY {sort_mapping[sort_by]}"
+        else:
+            base_query += " ORDER BY o.created_at DESC"
+        
+        # Add limit
+        if filters.get('limit') and filters['limit'] != 'all':
+            base_query += " LIMIT %s"
+            params.append(int(filters['limit']))
+        
+        cursor.execute(base_query, params)
+        orders = cursor.fetchall()
+        
+        # Get order items for each order
+        for order in orders:
+            cursor.execute("SELECT * FROM order_items WHERE order_id = %s", (order['id'],))
+            order['items'] = cursor.fetchall()
+            
+            # Format measurements if available
+            if order['chest']:  # Check if measurements exist
+                order['measurements'] = {
+                    'customer_id': order['customer_id'],
+                    'name': order['measurement_name'],
+                    'gender': order['gender'],
+                    'notes': order['notes'],
+                    'chest': order['chest'],
+                    'waist': order['waist'],
+                    'seat': order['seat'],
+                    'shirtLength': order['shirt_length'],
+                    'armLength': order['arm_length'],
+                    'neck': order['neck'],
+                    'hip': order['hip'],
+                    'poloShirtLength': order['polo_shirt_length'],
+                    'shoulderWidth': order['shoulder_width'],
+                    'wrist': order['wrist'],
+                    'biceps': order['biceps']
+                }
+            else:
+                order['measurements'] = None
+        
+        connection.close()
+        
+        return jsonify({
+            'success': True,
+            'data': orders,
+            'total': len(orders)
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': 'Failed to fetch orders for download',
+            'error': str(e)
+        }), 500
+
 @superadmin_bp.route('/superadmin/orders/<int:order_id>/status', methods=['PUT'])
 @require_auth(['superadmin'])
 def update_order_status(order_id):

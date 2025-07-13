@@ -232,14 +232,6 @@ const ManageUsers = () => {
               fontSize: '14px',
               flexWrap: 'wrap'
             }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Building size={16} />
-                {businessUsers.length} Business Users
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Users size={16} />
-                {individualUsers.length} Individual Users
-              </span>
             </div>
           </div>
         </div>

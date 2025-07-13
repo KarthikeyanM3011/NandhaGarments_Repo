@@ -68,7 +68,7 @@ const BusinessMeasurements = () => {
   };
 
   const handleDeleteMeasurement = async (id) => {
-    if (window.confirm('Are you sure you want to delete this customer measurement? This action cannot be undone.')) {
+    if (window.confirm('Are you sure you want to delete this measurement? This action cannot be undone.')) {
       setDeletingId(id);
       try {
         await businessAPI.deleteMeasurement(id);
@@ -136,7 +136,7 @@ const BusinessMeasurements = () => {
             animation: 'spin 1s linear infinite'
           }}></div>
           <p style={{ color: '#6b7280', fontSize: '16px' }}>
-            Loading customer measurements...
+            Loading measurements...
           </p>
         </div>
       </Layout>
@@ -205,14 +205,14 @@ const BusinessMeasurements = () => {
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent'
               }}>
-                Customer Measurements
+                Measurements
               </h1>
               <p style={{ 
                 fontSize: '1.1rem', 
                 opacity: 0.9,
                 marginBottom: '16px'
               }}>
-                Manage customer measurements for accurate tailoring
+                Manage measurements for accurate tailoring
               </p>
               <div style={{
                 display: 'flex',
@@ -254,7 +254,7 @@ const BusinessMeasurements = () => {
               }}
             >
               <Plus size={20} />
-              Add Customer Measurement
+              Add Measurement
             </button>
           </div>
         </div>
@@ -284,7 +284,7 @@ const BusinessMeasurements = () => {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  Search Customers
+                  Search
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Search size={16} style={{
@@ -688,7 +688,7 @@ const BusinessMeasurements = () => {
               margin: '0 0 12px',
               color: '#374151'
             }}>
-              {measurements.length === 0 ? 'No customer measurements recorded yet' : 'No customers match your filters'}
+              {measurements.length === 0 ? 'No measurements recorded yet' : 'No customers match your filters'}
             </h3>
             <p style={{ 
               color: '#6b7280',
@@ -696,7 +696,7 @@ const BusinessMeasurements = () => {
               fontSize: '16px'
             }}>
               {measurements.length === 0 
-                ? 'Start by adding your first customer measurement to get perfectly tailored clothes' 
+                ? 'Start by adding your first measurement to get perfectly tailored clothes' 
                 : 'Try adjusting your search or filters to see more customers'
               }
             </p>
@@ -727,7 +727,7 @@ const BusinessMeasurements = () => {
                 }}
               >
                 <Plus size={20} />
-                Add Your First Customer Measurement
+                Add Your First Measurement
               </button>
             ) : (
               <button

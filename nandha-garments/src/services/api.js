@@ -92,4 +92,5 @@ export const superAdminAPI = {
   deleteProduct: (id) => api.delete(`/superadmin/products/${id}`),
   getOrders: () => api.get('/superadmin/orders'),
   updateOrderStatus: (id, status) => api.put(`/superadmin/orders/${id}/status`, { status }),
+  getOrdersForDownload: (filters) => api.post('/superadmin/orders/download', filters)
 };

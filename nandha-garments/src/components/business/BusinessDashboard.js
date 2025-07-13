@@ -127,7 +127,7 @@ const BusinessDashboard = () => {
               opacity: 0.9,
               marginBottom: '16px'
             }}>
-              Manage your customer measurements and track business performance
+              Manage the measurements and track business performance
             </p>
             <div style={{
               display: 'flex',
@@ -146,7 +146,7 @@ const BusinessDashboard = () => {
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Ruler size={16} />
-                {dashboardData.measurements} Customer Measurements
+                {dashboardData.measurements} Measurements
               </span>
             </div>
           </div>
@@ -190,7 +190,7 @@ const BusinessDashboard = () => {
                 <h3 style={{ fontSize: '2rem', fontWeight: '700', margin: 0 }}>
                   {dashboardData.measurements}
                 </h3>
-                <p style={{ margin: 0, opacity: 0.9 }}>Customer Measurements</p>
+                <p style={{ margin: 0, opacity: 0.9 }}>Measurements</p>
               </div>
             </div>
             <Link 

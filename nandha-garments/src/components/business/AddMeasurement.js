@@ -315,12 +315,12 @@ const AddMeasurement = ({ userType, measurement, onSubmit, onCancel }) => {
                     color: '#374151',
                     marginBottom: '8px'
                   }}>
-                    Customer ID <span style={{ color: '#dc2626' }}>*</span>
+                    ID <span style={{ color: '#dc2626' }}>*</span>
                   </label>
                   <input
                     type="text"
                     name="id"
-                    placeholder="Enter customer ID"
+                    placeholder="Enter ID"
                     value={formData.id}
                     onChange={handleChange}
                     required
@@ -361,12 +361,12 @@ const AddMeasurement = ({ userType, measurement, onSubmit, onCancel }) => {
                     color: '#374151',
                     marginBottom: '8px'
                   }}>
-                    Customer Name <span style={{ color: '#dc2626' }}>*</span>
+                    Name <span style={{ color: '#dc2626' }}>*</span>
                   </label>
                   <input
                     type="text"
                     name="name"
-                    placeholder="Enter customer name"
+                    placeholder="Enter name"
                     value={formData.name}
                     onChange={handleChange}
                     required

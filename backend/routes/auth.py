@@ -31,7 +31,7 @@ def superadmin_login():
             'error': 'Email or password is incorrect'
         }), 401
     
-    if bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8')):
+    if not bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8')):
         return jsonify({
             'success': False,
             'message': 'Invalid credentials',
@@ -87,7 +87,7 @@ def business_login():
             'error': 'Your account is pending approval from administrator'
         }), 403
     
-    if bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8')):
+    if not bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8')):
         return jsonify({
             'success': False,
             'message': 'Invalid credentials',
@@ -224,8 +224,7 @@ def individual_login():
             'error': 'Email or password is incorrect'
         }), 401
     
-    if bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8')):
-        print("Here in password")
+    if not bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8')):
         return jsonify({
             'success': False,
             'message': 'Invalid credentials',

@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { ArrowLeft, Eye, EyeOff, Upload, Building, Mail, Phone, MapPin, Lock, FileText, User, CreditCard } from 'lucide-react';
 
 const BusinessSignup = () => {
@@ -9,6 +7,11 @@ const BusinessSignup = () => {
     gst: '',
     pan: '',
     address: '',
+    apartment: '',
+    city: '',
+    state: '',
+    country: '',
+    zipCode: '',
     contactPersonName: '',
     contactNumber: '',
     email: '',
@@ -21,15 +24,41 @@ const BusinessSignup = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  
-  const { signup } = useAuth();
-  const navigate = useNavigate();
+  const [passwordErrors, setPasswordErrors] = useState([]);
+
+  const validatePassword = (password) => {
+    const errors = [];
+    
+    if (password.length <= 5) {
+      errors.push('Password must be more than 5 characters');
+    }
+    
+    if (!/[A-Za-z]/.test(password)) {
+      errors.push('Password must contain at least 1 letter');
+    }
+    
+    if (!/[0-9]/.test(password)) {
+      errors.push('Password must contain at least 1 number');
+    }
+    
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      errors.push('Password must contain at least 1 special character');
+    }
+    
+    return errors;
+  };
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+
+    if (name === 'password') {
+      const errors = validatePassword(value);
+      setPasswordErrors(errors);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -46,11 +75,42 @@ const BusinessSignup = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const combineAddress = () => {
+    const addressParts = [
+      formData.address,
+      formData.apartment,
+      formData.city,
+      formData.state,
+      formData.country,
+      formData.zipCode
+    ].filter(part => part.trim() !== '');
+    
+    return addressParts.join(', ');
+  };
+
+  const handleSubmit = async () => {
     setLoading(true);
     setError('');
     setSuccess('');
+
+    // Validate required fields
+    if (!formData.legalEntityName || !formData.gst || !formData.pan || 
+        !formData.address || !formData.city || !formData.state || 
+        !formData.country || !formData.zipCode || !formData.contactPersonName || 
+        !formData.contactNumber || !formData.email || !formData.password || 
+        !formData.confirmPassword) {
+      setError('Please fill in all required fields');
+      setLoading(false);
+      return;
+    }
+
+    // Validate password
+    const passwordValidationErrors = validatePassword(formData.password);
+    if (passwordValidationErrors.length > 0) {
+      setError('Please fix password requirements: ' + passwordValidationErrors.join(', '));
+      setLoading(false);
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
@@ -58,19 +118,41 @@ const BusinessSignup = () => {
       return;
     }
 
-    const result = await signup(formData, 'business');
+    // Combine address fields
+    const combinedAddress = combineAddress();
     
-    if (result.success) {
-      setSuccess('Registration request submitted successfully! Please wait for admin approval.');
+    const submitData = {
+      ...formData,
+      address: combinedAddress
+    };
+
+    // Simulate API call
+    try {
+      // Replace this with actual API call: const result = await signup(submitData, 'business');
+      console.log('Submitting business data:', submitData);
+      
+      // Simulate successful response
       setTimeout(() => {
-        navigate('/business/login');
+        setSuccess('Registration request submitted successfully! Please wait for admin approval.');
+        setLoading(false);
+        // Navigate to login: navigate('/business/login');
       }, 3000);
-    } else {
-      setError(result.error);
+    } catch (err) {
+      setError('Registration failed. Please try again.');
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
+
+  const states = [
+    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana',
+    'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+    'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+    'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi'
+  ];
+
+  const countries = [
+    'India', 'United States', 'Canada', 'United Kingdom', 'Australia', 'Germany', 'France', 'Japan', 'Singapore'
+  ];
 
   return (
     <div style={{ 
@@ -108,17 +190,19 @@ const BusinessSignup = () => {
         background: 'rgba(255, 255, 255, 0.95)',
         borderRadius: '20px',
         padding: '40px',
-        maxWidth: '700px',
+        maxWidth: '800px',
         width: '100%',
         boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
         backdropFilter: 'blur(20px)',
         border: '1px solid rgba(255, 255, 255, 0.2)',
         position: 'relative',
-        zIndex: 1
+        zIndex: 1,
+        maxHeight: '90vh',
+        overflowY: 'auto'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <Link 
-            to="/" 
+          <button 
+            onClick={() => console.log('Navigate to home')}
             style={{ 
               color: '#667eea', 
               textDecoration: 'none', 
@@ -128,7 +212,10 @@ const BusinessSignup = () => {
               marginBottom: '24px',
               fontSize: '14px',
               fontWeight: '500',
-              transition: 'all 0.3s ease'
+              transition: 'all 0.3s ease',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer'
             }}
             onMouseEnter={(e) => {
               e.target.style.color = '#4f46e5';
@@ -139,7 +226,7 @@ const BusinessSignup = () => {
           >
             <ArrowLeft size={16} />
             Back to Home
-          </Link>
+          </button>
           
           <div style={{ 
             display: 'flex', 
@@ -205,7 +292,7 @@ const BusinessSignup = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <div>
           {error && (
             <div style={{ 
               marginBottom: '24px', 
@@ -261,7 +348,7 @@ const BusinessSignup = () => {
                 color: '#374151',
                 marginBottom: '8px'
               }}>
-                Legal Entity Name
+                Legal Entity Name *
               </label>
               <input
                 type="text"
@@ -269,7 +356,6 @@ const BusinessSignup = () => {
                 placeholder="Company Legal Name"
                 value={formData.legalEntityName}
                 onChange={handleChange}
-                required
                 style={{
                   width: '100%',
                   padding: '12px 16px',
@@ -305,7 +391,7 @@ const BusinessSignup = () => {
                   color: '#374151',
                   marginBottom: '8px'
                 }}>
-                  GST Number
+                  GST Number *
                 </label>
                 <div style={{ position: 'relative' }}>
                   <FileText size={16} style={{
@@ -321,7 +407,6 @@ const BusinessSignup = () => {
                     placeholder="GST Number"
                     value={formData.gst}
                     onChange={handleChange}
-                    required
                     style={{
                       width: '100%',
                       padding: '12px 16px 12px 40px',
@@ -352,7 +437,7 @@ const BusinessSignup = () => {
                   color: '#374151',
                   marginBottom: '8px'
                 }}>
-                  PAN Number
+                  PAN Number *
                 </label>
                 <div style={{ position: 'relative' }}>
                   <CreditCard size={16} style={{
@@ -368,7 +453,6 @@ const BusinessSignup = () => {
                     placeholder="PAN Number"
                     value={formData.pan}
                     onChange={handleChange}
-                    required
                     style={{
                       width: '100%',
                       padding: '12px 16px 12px 40px',
@@ -391,6 +475,22 @@ const BusinessSignup = () => {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Company Address Section */}
+          <div style={{ marginBottom: '32px' }}>
+            <h3 style={{
+              fontSize: '16px',
+              fontWeight: '700',
+              color: '#374151',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <MapPin size={18} />
+              Company Address
+            </h3>
 
             <div style={{ marginBottom: '20px' }}>
               <label style={{
@@ -400,7 +500,7 @@ const BusinessSignup = () => {
                 color: '#374151',
                 marginBottom: '8px'
               }}>
-                Company Address
+                Street Address *
               </label>
               <div style={{ position: 'relative' }}>
                 <MapPin size={16} style={{
@@ -409,13 +509,12 @@ const BusinessSignup = () => {
                   top: '16px',
                   color: '#9ca3af'
                 }} />
-                <textarea
+                <input
+                  type="text"
                   name="address"
-                  placeholder="Complete company address"
+                  placeholder="Building number and street name"
                   value={formData.address}
                   onChange={handleChange}
-                  rows="3"
-                  required
                   style={{
                     width: '100%',
                     padding: '12px 16px 12px 40px',
@@ -424,7 +523,222 @@ const BusinessSignup = () => {
                     fontSize: '14px',
                     transition: 'all 0.3s ease',
                     outline: 'none',
-                    resize: 'vertical',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#667eea';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e5e7eb';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '8px'
+              }}>
+                Suite, Floor, etc. (Optional)
+              </label>
+              <div style={{ position: 'relative' }}>
+                <Building size={16} style={{
+                  position: 'absolute',
+                  left: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#9ca3af'
+                }} />
+                <input
+                  type="text"
+                  name="apartment"
+                  placeholder="Suite, floor, building, tower, etc."
+                  value={formData.apartment}
+                  onChange={handleChange}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px 12px 40px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    transition: 'all 0.3s ease',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#667eea';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e5e7eb';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: '1fr 1fr', 
+              gap: '16px', 
+              marginBottom: '20px' 
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
+                  City *
+                </label>
+                <input
+                  type="text"
+                  name="city"
+                  placeholder="City"
+                  value={formData.city}
+                  onChange={handleChange}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    transition: 'all 0.3s ease',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#667eea';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e5e7eb';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
+                  State/Province *
+                </label>
+                <select
+                  name="state"
+                  value={formData.state}
+                  onChange={handleChange}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    transition: 'all 0.3s ease',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    backgroundColor: 'white'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#667eea';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e5e7eb';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                >
+                  <option value="">Select State</option>
+                  {states.map(state => (
+                    <option key={state} value={state}>{state}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: '1fr 1fr', 
+              gap: '16px', 
+              marginBottom: '20px' 
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
+                  Country *
+                </label>
+                <select
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    transition: 'all 0.3s ease',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    backgroundColor: 'white'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#667eea';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e5e7eb';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                >
+                  <option value="">Select Country</option>
+                  {countries.map(country => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
+                  ZIP/Postal Code *
+                </label>
+                <input
+                  type="text"
+                  name="zipCode"
+                  placeholder="ZIP/Postal Code"
+                  value={formData.zipCode}
+                  onChange={handleChange}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    transition: 'all 0.3s ease',
+                    outline: 'none',
                     boxSizing: 'border-box'
                   }}
                   onFocus={(e) => {
@@ -469,7 +783,7 @@ const BusinessSignup = () => {
                   color: '#374151',
                   marginBottom: '8px'
                 }}>
-                  Contact Person Name
+                  Contact Person Name *
                 </label>
                 <div style={{ position: 'relative' }}>
                   <User size={16} style={{
@@ -485,7 +799,6 @@ const BusinessSignup = () => {
                     placeholder="Contact Person Name"
                     value={formData.contactPersonName}
                     onChange={handleChange}
-                    required
                     style={{
                       width: '100%',
                       padding: '12px 16px 12px 40px',
@@ -516,7 +829,7 @@ const BusinessSignup = () => {
                   color: '#374151',
                   marginBottom: '8px'
                 }}>
-                  Contact Number
+                  Contact Number *
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Phone size={16} style={{
@@ -532,7 +845,6 @@ const BusinessSignup = () => {
                     placeholder="Contact Number"
                     value={formData.contactNumber}
                     onChange={handleChange}
-                    required
                     style={{
                       width: '100%',
                       padding: '12px 16px 12px 40px',
@@ -564,7 +876,7 @@ const BusinessSignup = () => {
                 color: '#374151',
                 marginBottom: '8px'
               }}>
-                Email Address
+                Email Address *
               </label>
               <div style={{ position: 'relative' }}>
                 <Mail size={16} style={{
@@ -580,7 +892,6 @@ const BusinessSignup = () => {
                   placeholder="organization@company.com"
                   value={formData.email}
                   onChange={handleChange}
-                  required
                   style={{
                     width: '100%',
                     padding: '12px 16px 12px 40px',
@@ -633,7 +944,7 @@ const BusinessSignup = () => {
                   color: '#374151',
                   marginBottom: '8px'
                 }}>
-                  Password
+                  Password *
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Lock size={16} style={{
@@ -649,11 +960,10 @@ const BusinessSignup = () => {
                     placeholder="Create password"
                     value={formData.password}
                     onChange={handleChange}
-                    required
                     style={{
                       width: '100%',
                       padding: '12px 40px 12px 40px',
-                      border: '2px solid #e5e7eb',
+                      border: `2px solid ${passwordErrors.length > 0 && formData.password ? '#f87171' : '#e5e7eb'}`,
                       borderRadius: '8px',
                       fontSize: '14px',
                       transition: 'all 0.3s ease',
@@ -661,11 +971,11 @@ const BusinessSignup = () => {
                       boxSizing: 'border-box'
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = '#667eea';
-                      e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                      e.target.style.borderColor = passwordErrors.length > 0 ? '#f87171' : '#667eea';
+                      e.target.style.boxShadow = `0 0 0 3px rgba(102, 126, 234, 0.1)`;
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = '#e5e7eb';
+                      e.target.style.borderColor = passwordErrors.length > 0 && formData.password ? '#f87171' : '#e5e7eb';
                       e.target.style.boxShadow = 'none';
                     }}
                   />
@@ -693,6 +1003,23 @@ const BusinessSignup = () => {
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
+                {passwordErrors.length > 0 && formData.password && (
+                  <div style={{ marginTop: '8px' }}>
+                    {passwordErrors.map((error, index) => (
+                      <p key={index} style={{ 
+                        fontSize: '12px', 
+                        color: '#dc2626', 
+                        margin: '2px 0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        <span style={{ color: '#dc2626' }}>•</span>
+                        {error}
+                      </p>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div>
@@ -703,7 +1030,7 @@ const BusinessSignup = () => {
                   color: '#374151',
                   marginBottom: '8px'
                 }}>
-                  Confirm Password
+                  Confirm Password *
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Lock size={16} style={{
@@ -719,7 +1046,6 @@ const BusinessSignup = () => {
                     placeholder="Confirm password"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    required
                     style={{
                       width: '100%',
                       padding: '12px 40px 12px 40px',
@@ -858,12 +1184,12 @@ const BusinessSignup = () => {
           </div>
 
           <button 
-            type="submit" 
-            disabled={loading}
+            onClick={handleSubmit}
+            disabled={loading || passwordErrors.length > 0}
             style={{
               width: '100%',
               padding: '16px 16px',
-              background: loading 
+              background: loading || passwordErrors.length > 0
                 ? '#9ca3af' 
                 : 'linear-gradient(135deg, #f59e0b, #d97706)',
               border: 'none',
@@ -871,18 +1197,18 @@ const BusinessSignup = () => {
               color: 'white',
               fontSize: '16px',
               fontWeight: '600',
-              cursor: loading ? 'not-allowed' : 'pointer',
+              cursor: loading || passwordErrors.length > 0 ? 'not-allowed' : 'pointer',
               transition: 'all 0.3s ease',
-              boxShadow: loading ? 'none' : '0 4px 15px rgba(245, 158, 11, 0.3)'
+              boxShadow: loading || passwordErrors.length > 0 ? 'none' : '0 4px 15px rgba(245, 158, 11, 0.3)'
             }}
             onMouseEnter={(e) => {
-              if (!loading) {
+              if (!loading && passwordErrors.length === 0) {
                 e.target.style.transform = 'translateY(-2px)';
                 e.target.style.boxShadow = '0 8px 25px rgba(245, 158, 11, 0.4)';
               }
             }}
             onMouseLeave={(e) => {
-              if (!loading) {
+              if (!loading && passwordErrors.length === 0) {
                 e.target.style.transform = 'translateY(0)';
                 e.target.style.boxShadow = '0 4px 15px rgba(245, 158, 11, 0.3)';
               }
@@ -904,7 +1230,7 @@ const BusinessSignup = () => {
               'Submit Registration Request'
             )}
           </button>
-        </form>
+        </div>
 
         <div style={{ 
           textAlign: 'center', 
@@ -918,13 +1244,16 @@ const BusinessSignup = () => {
             margin: '0 0 8px 0'
           }}>
             Already have an account?{' '}
-            <Link 
-              to="/business/login" 
+            <button 
+              onClick={() => console.log('Navigate to business login')}
               style={{ 
                 color: '#667eea', 
                 textDecoration: 'none',
                 fontWeight: '600',
-                transition: 'all 0.3s ease'
+                transition: 'all 0.3s ease',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer'
               }}
               onMouseEnter={(e) => {
                 e.target.style.color = '#4f46e5';
@@ -934,7 +1263,7 @@ const BusinessSignup = () => {
               }}
             >
               Sign in here
-            </Link>
+            </button>
           </p>
           <p style={{ 
             color: '#9ca3af',

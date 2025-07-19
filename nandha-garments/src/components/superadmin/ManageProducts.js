@@ -368,7 +368,7 @@ const ManageProducts = () => {
                       color: '#0c4a6e',
                       margin: 0
                     }}>
-                      {formatCurrency(product.sellingPrice)}
+                      {formatCurrency(product.selling_price)}
                     </p>
                   </div>
                   {product.sellingPrice < product.price && (

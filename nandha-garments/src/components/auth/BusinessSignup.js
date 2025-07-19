@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { ArrowLeft, Eye, EyeOff, Upload, Building, Mail, Phone, MapPin, Lock, FileText, User, CreditCard } from 'lucide-react';
 
 const BusinessSignup = () => {
@@ -27,6 +28,7 @@ const BusinessSignup = () => {
   const [loading, setLoading] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState([]);
   const navigate = useNavigate();
+  const { signup } = useAuth();
 
   const validatePassword = (password) => {
     const errors = [];
@@ -128,18 +130,30 @@ const BusinessSignup = () => {
       address: combinedAddress
     };
 
-    // Simulate API call
     try {
-      // Replace this with actual API call: const result = await signup(submitData, 'business');
-      console.log('Submitting business data:', submitData);
-      // Simulate successful response
+      setLoading(true);
+      setError('');
+      setSuccess('');
+      console.log('Submitting data:', submitData);
+    
+      const response = await signup(submitData, 'business'); // assuming signup is an async function
+    
+      if (!response.success) {
+        throw new Error(response.error || 'Registration failed');
+      }
+    
+      setSuccess('Account created successfully! You can now log in.');
+      setLoading(false);
+    
       setTimeout(() => {
-        setSuccess('Registration request submitted successfully! Please wait for admin approval.');
-        setLoading(false);
         navigate('/business/login');
-      }, 3000);
+      }, 2000);
+    
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      console.error('Signup error:', err);
+    
+      const errorMsg = err?.response?.data?.message || err.message || 'Registration failed. Please try again.';
+      setError(errorMsg);
       setLoading(false);
     }
   };

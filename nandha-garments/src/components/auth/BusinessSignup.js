@@ -108,7 +108,7 @@ const BusinessSignup = () => {
     const passwordValidationErrors = validatePassword(formData.password);
     if (passwordValidationErrors.length > 0) {
       setError('Please fix password requirements: ' + passwordValidationErrors.join(', '));
-      setLoading(false);
+      setLoading(false);s
       return;
     }
 
@@ -201,8 +201,8 @@ const BusinessSignup = () => {
         overflowY: 'auto'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <button 
-            onClick={() => console.log('Navigate to home')}
+        <Link 
+            to="/" 
             style={{ 
               color: '#667eea', 
               textDecoration: 'none', 
@@ -212,10 +212,7 @@ const BusinessSignup = () => {
               marginBottom: '24px',
               fontSize: '14px',
               fontWeight: '500',
-              transition: 'all 0.3s ease',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer'
+              transition: 'all 0.3s ease'
             }}
             onMouseEnter={(e) => {
               e.target.style.color = '#4f46e5';
@@ -226,7 +223,7 @@ const BusinessSignup = () => {
           >
             <ArrowLeft size={16} />
             Back to Home
-          </button>
+          </Link>
           
           <div style={{ 
             display: 'flex', 

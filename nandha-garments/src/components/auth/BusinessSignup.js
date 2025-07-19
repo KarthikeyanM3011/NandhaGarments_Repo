@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff, Upload, Building, Mail, Phone, MapPin, Lock, FileText, User, CreditCard } from 'lucide-react';
 
 const BusinessSignup = () => {
@@ -25,6 +26,7 @@ const BusinessSignup = () => {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState([]);
+  const navigate = useNavigate();
 
   const validatePassword = (password) => {
     const errors = [];
@@ -108,7 +110,7 @@ const BusinessSignup = () => {
     const passwordValidationErrors = validatePassword(formData.password);
     if (passwordValidationErrors.length > 0) {
       setError('Please fix password requirements: ' + passwordValidationErrors.join(', '));
-      setLoading(false);s
+      setLoading(false);
       return;
     }
 
@@ -130,12 +132,11 @@ const BusinessSignup = () => {
     try {
       // Replace this with actual API call: const result = await signup(submitData, 'business');
       console.log('Submitting business data:', submitData);
-      
       // Simulate successful response
       setTimeout(() => {
         setSuccess('Registration request submitted successfully! Please wait for admin approval.');
         setLoading(false);
-        // Navigate to login: navigate('/business/login');
+        navigate('/business/login');
       }, 3000);
     } catch (err) {
       setError('Registration failed. Please try again.');

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff, User, Mail, Phone, MapPin, Lock, UserPlus, Home, Building } from 'lucide-react';
 
 const IndividualSignup = () => {
@@ -21,6 +22,7 @@ const IndividualSignup = () => {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState([]);
+  const navigate = useNavigate();
 
   const validatePassword = (password) => {
     const errors = [];
@@ -111,12 +113,11 @@ const IndividualSignup = () => {
     try {
       // Replace this with actual API call: const result = await signup(submitData, 'individual');
       console.log('Submitting data:', submitData);
-      
       // Simulate successful response
       setTimeout(() => {
         setSuccess('Account created successfully! You can now log in.');
         setLoading(false);
-        // Navigate to login: navigate('/individual/login');
+        navigate('/individual/login');
       }, 2000);
     } catch (err) {
       setError('Registration failed. Please try again.');
